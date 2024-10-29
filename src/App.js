@@ -1,6 +1,6 @@
 import logo from './logo.svg';
-import './App.css';
-import Header from './Header'
+import './CSS/App.css';
+import Header from './Component/Header'
 import Router from './Router'
 import 'bootstrap/dist/css/bootstrap.min.css';
 
