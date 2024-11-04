@@ -11,6 +11,7 @@ function License() {
     // 로딩 및 에러상태를 관리하기 위한 State
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const paginationModel = { page: 0, pageSize: 25 };
 
     const columns = [
         { field: 'Idx', headerName: 'ID', width: 70 },
@@ -34,16 +35,30 @@ function License() {
             width: 150,
             renderCell: (params) => (
                 <Button onClick={() => delLicenseBtnClick(params.row)}>
-                    버튼
+                    라이센스 삭제
                 </Button>
             ),
         },
     ];
 
-    const delLicenseBtnClick = (row) => {
-        console.log(`Button clicked for ID: ${row.Idx}`);
+    const delLicenseBtnClick = async (row) => {
+        console.log(`Button clicked for ID: ${row.License}`);
         // TODO : 삭제하기 API 연동
+        let param = {"license" : row.License};
         // Add your desired functionality here
+        axios.delete('http://localhost:5000/license',{
+            data: param,
+            headers: {
+              'Content-Type': 'application/json'
+            }
+        })
+        .then(async (res) => {
+            const response = await axios.get('http://localhost:5000/license');
+            setLicenseList(response.data); // 응답값을 상태에 저장
+        })
+        .catch((error) => {
+            console.error(error);
+        });
     };
 
     const addLicenseBtnClick = async () => {
@@ -53,7 +68,6 @@ function License() {
         setLicenseList(response.data); // 응답값을 상태에 저장
     }
       
-    const paginationModel = { page: 0, pageSize: 25 };
 
     useEffect(()=>{
         const getData = async () => {
