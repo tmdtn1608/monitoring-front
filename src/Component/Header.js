@@ -14,6 +14,7 @@ function BasicExample() {
           <Nav className="flex-grow-1">
             <Nav.Link href="license">License</Nav.Link>
             <Nav.Link href="device">Device</Nav.Link>
+            <Nav.Link href="realtime">Realtime</Nav.Link>
             <Nav.Link href="process">Process</Nav.Link>
           </Nav>
         </Navbar.Collapse>

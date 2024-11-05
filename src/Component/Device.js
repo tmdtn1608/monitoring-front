@@ -33,7 +33,6 @@ function Device() {
 
     const delDeviceBtnClick = async (row) => {
         console.log(`Button clicked for ID: ${row.mac}`);
-        // TODO : 기기삭제
         let param = {"mac" : row.mac};
         // Add your desired functionality here
         axios.delete('http://localhost:5000/device',{

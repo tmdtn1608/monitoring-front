@@ -43,7 +43,6 @@ function License() {
 
     const delLicenseBtnClick = async (row) => {
         console.log(`Button clicked for ID: ${row.License}`);
-        // TODO : 삭제하기 API 연동
         let param = {"license" : row.License};
         // Add your desired functionality here
         axios.delete('http://localhost:5000/license',{
