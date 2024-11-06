@@ -14,11 +14,18 @@ function Process() {
     // 로딩 및 에러상태를 관리하기 위한 State
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [editRow, setEditRow] = useState(null);
 
     // modal control
     const [editShow, setEditShow] = useState(false);
-    const handleEditShow = () => setEditShow(true);
-    const handleEditClose = () => setEditShow(false);
+    const handleEditShow = (row) => {
+        setEditRow(row);
+        setEditShow(true);
+    }
+    const handleEditClose = () => {
+        setEditRow(null);
+        setEditShow(false);
+    }
     
     const [addShow, setAddShow] = useState(false);
     const handleAddShow = () => setAddShow(true);
@@ -51,7 +58,7 @@ function Process() {
             width: 300,
             renderCell: (params) => (
                 <>
-                    <Button className='Control-Btn' onClick={() => handleEditShow()}>
+                    <Button className='Control-Btn' onClick={() => handleEditShow(params.row)}>
                         프로세스 수정
                     </Button>
                     <Button 
@@ -111,7 +118,7 @@ function Process() {
                     sx={{ border: 0 }}
             />
             </Paper>
-            <EditModal show={editShow} close={handleEditClose}/>
+            <EditModal data={editRow} show={editShow} close={handleEditClose}/>
             <AddModal show={addShow} close={handleAddClose}/>
         </div>
     );
