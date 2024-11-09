@@ -4,8 +4,8 @@ import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import axios from 'axios';
 import Button from 'react-bootstrap/Button';
 import '../CSS/Process.css'
-import EditModal from './EditModal';
-import AddModal from './AddModal';
+import EditModal from './ProcessEditModal';
+import AddModal from './ProcessAddModal';
 
 
 function Process() {
@@ -72,17 +72,18 @@ function Process() {
     ];
 
     const delProcessBtnClick = async (row) => {
-        console.log(`Button clicked for ID: ${row.License}`);
-        let param = {"license" : row.License};
+        console.log(`Button clicked for ID: ${row.ProcessName}`);
+        let param = {"ProcessName" : row.ProcessName};
         // Add your desired functionality here
-        axios.delete('http://localhost:5000/license',{
+        axios.delete('http://localhost:5000/process',{
             data: param,
             headers: {
               'Content-Type': 'application/json'
             }
         })
         .then(async (res) => {
-            const response = await axios.get('http://localhost:5000/license');
+            console.log('delete confirm');
+            const response = await axios.get('http://localhost:5000/process');
             setProcessList(response.data); // 응답값을 상태에 저장
         })
         .catch((error) => {

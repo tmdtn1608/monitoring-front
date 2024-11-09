@@ -10,22 +10,43 @@ function Device() {
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [editRow, setEditRow] = useState(null);
     const paginationModel = { page: 0, pageSize: 25 };
+
+    // modal control
+    const [editShow, setEditShow] = useState(false);
+    const handleEditShow = (row) => {
+        setEditRow(row);
+        setEditShow(true);
+    }
+    const handleEditClose = () => {
+        setEditRow(null);
+        setEditShow(false);
+    }
 
     const columns = [
         { field: 'Idx', headerName: 'ID', width: 70 },
         { field: 'mac', headerName: '디바이스(맥주소)', width: 330 },
+        { field : 'Nick', headerName: '닉네임', width : 200 },
         { field: 'IsUsed', headerName: '라이센스 사용여부', width: 330,
             renderCell:(params) => (params.value === 1 ? '사용중' : '미사용')
         },
         {
             field: 'Action', // New field for the action column
             headerName: ' ', // Header for the new column
-            width: 150,
+            width: 300,
             renderCell: (params) => (
-                <Button onClick={() => delDeviceBtnClick(params.row)}>
-                    디바이스 삭제
-                </Button>
+                <>
+                    <Button className='Control-Btn' 
+                        onClick={() => delDeviceBtnClick(params.row)}>
+                        디바이스 삭제
+                    </Button>
+                    <Button
+                        className='Control-Btn'
+                        onClick={() => editDeviceBtnClick(params.row)}>
+                        디바이스 수정
+                    </Button>
+                </>
             ),
         },
         
@@ -50,6 +71,10 @@ function Device() {
         });
     };
 
+    const editDeviceBtnClick = async () => {
+
+    }
+
     useEffect(()=>{
         const getData = async () => {
             setLoading(true);
@@ -71,6 +96,7 @@ function Device() {
                     sx={{ border: 0 }}
             />
             </Paper>
+            
         </div>
     );
     

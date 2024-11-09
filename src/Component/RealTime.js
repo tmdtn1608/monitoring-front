@@ -100,6 +100,70 @@ Row.propTypes = {
 
 
 function RealTime() {
+
+    const [messages, setMessages] = useState([]);
+    const [socket, setSocket] = useState(null);
+
+    useEffect(() => {
+        // 웹소켓 연결
+        const ws = new WebSocket('ws://localhost:5000/ws');
+    
+        // 웹소켓이 열렸을 때
+        ws.onopen = () => {
+          console.log('Connected to the WebSocket server');
+          ws.send('Hello Server!');  // 서버로 메시지 전송
+        };
+    
+        // 웹소켓이 메시지를 수신했을 때
+        ws.onmessage = (event) => {
+            try {
+                // client에서 던저진 데이터는 blob으로 온다.
+                if(typeof event.data == 'object') {
+                    // 가능한 경우 JSON 파싱 시도
+                    const blob = event.data;
+    
+                    // Blob을 텍스트로 변환
+                    const reader = new FileReader();
+                    
+                    reader.onloadend = function() {
+                        const jsonString = reader.result;
+                        const parsedData = JSON.parse(jsonString);
+                        console.log('Received parsed data:', parsedData);
+
+                        for (const element of parsedData.process) {
+                            if (element.name === "KakaoTalk") {
+                                console.log("Found It!");
+                            }
+                        }
+                    };
+                    reader.readAsText(blob);  // Blob을 텍스트로 변환
+                    // setMessages((prevMessages) => [...prevMessages, event.data]);
+                } 
+                else if (typeof event.data == 'string') {
+                    console.log(`Connected. ${event.data}`);
+                }
+            } catch (error) {
+                // JSON 형식이 아닐 경우 예외 처리 (즉, 단순 문자열 메시지)
+                console.error('Error parsing JSON:', error);
+            }
+           
+        };
+    
+        // 웹소켓이 닫혔을 때
+        ws.onclose = () => {
+          console.log('Disconnected from the WebSocket server');
+        };
+    
+        // 웹소켓이 에러를 발생했을 때
+        ws.onerror = (error) => {
+          console.error('WebSocket error:', error);
+        };
+    
+        // 컴포넌트 언마운트 시 웹소켓 연결 해제
+        return () => {
+          ws.close();
+        };
+      }, []);
     
     const rows = [
         createData('Frozen yoghurt', 159, 6.0, 24, 4.0, 3.99),

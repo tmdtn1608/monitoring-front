@@ -62,25 +62,25 @@ function EditModal({data, show, close}) {
                         <Form.Group className="d-flex align-items-center mb-3">
                             <Form.Label className="Edit-Modal-Label">Process name</Form.Label>
                             <Form.Control 
-                                name="processInput" type="text" 
+                                name="processInput" type="text" defaultValue={''}
                                 value={rowData === null ? '' : rowData.ProcessName} disabled/>
                         </Form.Group>
                         <Form.Group className="d-flex align-items-center mb-3">
                             <Form.Label className="Edit-Modal-Label">Black</Form.Label>
                             <Form.Check 
-                                name="BlackInput" type="checkbox" 
+                                name="BlackInput" type="checkbox" defaultChecked={false}
                                 checked={rowData === null ? false : rowData.IsBlack === 1}/>
                         </Form.Group>
                         <Form.Group className="d-flex align-items-center mb-3">
                             <Form.Label className="Edit-Modal-Label">Auto</Form.Label>
                             <Form.Check 
-                                name="AutoInput" type="checkbox" 
+                                name="AutoInput" type="checkbox" defaultChecked={false}
                                 value={rowData === null ? false : rowData.IsAuto === 1}/>
                         </Form.Group>
                         <Form.Group className="d-flex align-items-center mb-3">
                             <Form.Label className="Edit-Modal-Label">Memo</Form.Label>
                             <Form.Control 
-                                name="MemoInput" type="text" 
+                                name="MemoInput" type="text" defaultValue={''}
                                 value={rowData === null ? '' : rowData.Memo}/>
                         </Form.Group>
                         
