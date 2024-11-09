@@ -1,4 +1,5 @@
 import React, { useEffect, useState, createContext } from 'react';
+import axios from 'axios';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
@@ -32,13 +33,8 @@ function Row(props) {
                     {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                     </IconButton>
                 </TableCell>
-                <TableCell component="th" scope="row">
-                    {row.name}
-                </TableCell>
-                <TableCell align="right">{row.calories}</TableCell>
-                <TableCell align="right">{row.fat}</TableCell>
-                <TableCell align="right">{row.carbs}</TableCell>
-                <TableCell align="right">{row.protein}</TableCell>
+                <TableCell component="th" scope="row">{row.device}</TableCell>
+                <TableCell align="left">{row.date}</TableCell>
             </TableRow>
             <TableRow>
             <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -101,10 +97,41 @@ Row.propTypes = {
 
 function RealTime() {
 
+    // API 값 저장을 위한 State
+    const [realtimeList, setRealtimeList] = useState(null);
+    // 로딩 및 에러상태를 관리하기 위한 State
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+
     const [messages, setMessages] = useState([]);
     const [socket, setSocket] = useState(null);
 
+    const [rows, setRows] = useState([]);
+
     useEffect(() => {
+        const getData = async () => {
+            setLoading(true);
+            const response = await axios.get('http://localhost:5000/history');
+            setRealtimeList(response.data);
+            console.log(JSON.stringify(response.data));
+            if(response.data != null) {
+                response.data.forEach(el => {
+                    rows.push(createData(el.Device, el.last_login))
+                });
+
+            }
+
+            /*
+    [
+        {
+            "Device":"60:3e:5f:4d:23:11",
+            "last_login":"2024-11-09T04:53:47.000Z"
+        }
+    ]
+            */
+        }
+        getData();
+
         // 웹소켓 연결
         const ws = new WebSocket('ws://localhost:5000/ws');
     
@@ -128,7 +155,7 @@ function RealTime() {
                     reader.onloadend = function() {
                         const jsonString = reader.result;
                         const parsedData = JSON.parse(jsonString);
-                        console.log('Received parsed data:', parsedData);
+                        // console.log('Received parsed data:', parsedData);
 
                         for (const element of parsedData.process) {
                             if (element.name === "KakaoTalk") {
@@ -164,23 +191,12 @@ function RealTime() {
           ws.close();
         };
       }, []);
-    
-    const rows = [
-        createData('Frozen yoghurt', 159, 6.0, 24, 4.0, 3.99),
-        createData('Ice cream sandwich', 237, 9.0, 37, 4.3, 4.99),
-        createData('Eclair', 262, 16.0, 24, 6.0, 3.79),
-        createData('Cupcake', 305, 3.7, 67, 4.3, 2.5),
-        createData('Gingerbread', 356, 16.0, 49, 3.9, 1.5),
-    ];
 
-    function createData(name, calories, fat, carbs, protein, price) {
+    function createData(device, date) {
+        console.log(device);
         return {
-            name,
-            calories,
-            fat,
-            carbs,
-            protein,
-            price,
+            device,
+            date,
             history: [
                 {
                 date: '2020-01-05',
@@ -203,16 +219,13 @@ function RealTime() {
                     <TableHead>
                         <TableRow>
                             <TableCell />
-                            <TableCell>Dessert (100g serving)</TableCell>
-                            <TableCell align="right">Calories</TableCell>
-                            <TableCell align="right">Fat&nbsp;(g)</TableCell>
-                            <TableCell align="right">Carbs&nbsp;(g)</TableCell>
-                            <TableCell align="right">Protein&nbsp;(g)</TableCell>
+                            <TableCell>Device</TableCell>
+                            <TableCell>Date</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                     {rows.map((row) => (
-                        <Row key={row.name} row={row} />
+                        <Row key={row.device} row={row} />
                     ))}
                     </TableBody>
                 </Table>
