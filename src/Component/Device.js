@@ -3,6 +3,7 @@ import Paper from '@mui/material/Paper';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import axios from 'axios';
 import Button from 'react-bootstrap/Button';
+import EditModal from './DeviceEditModal';
 
 function Device() {
     // API 값 저장을 위한 State
@@ -19,9 +20,12 @@ function Device() {
         setEditRow(row);
         setEditShow(true);
     }
-    const handleEditClose = () => {
+    const handleEditClose = (reload) => {
         setEditRow(null);
         setEditShow(false);
+        if(reload) {
+            window.location.reload();
+        }
     }
 
     const columns = [
@@ -37,14 +41,14 @@ function Device() {
             width: 300,
             renderCell: (params) => (
                 <>
+                    <Button
+                        className='Control-Btn'
+                        onClick={() => handleEditShow(params.row)}>
+                        디바이스 수정
+                    </Button>
                     <Button className='Control-Btn' 
                         onClick={() => delDeviceBtnClick(params.row)}>
                         디바이스 삭제
-                    </Button>
-                    <Button
-                        className='Control-Btn'
-                        onClick={() => editDeviceBtnClick(params.row)}>
-                        디바이스 수정
                     </Button>
                 </>
             ),
@@ -96,7 +100,7 @@ function Device() {
                     sx={{ border: 0 }}
             />
             </Paper>
-            
+            <EditModal data={editRow} show={editShow} close={handleEditClose} />
         </div>
     );
     

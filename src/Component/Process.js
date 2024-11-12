@@ -15,29 +15,35 @@ function Process() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [editRow, setEditRow] = useState(null);
-
     // modal control
     const [editShow, setEditShow] = useState(false);
+    const [addShow, setAddShow] = useState(false);
     const handleEditShow = (row) => {
         setEditRow(row);
         setEditShow(true);
     }
-    const handleEditClose = () => {
+    const handleEditClose = (reload) => {
         setEditRow(null);
         setEditShow(false);
+        if(reload) {
+            window.location.reload();
+        }
     }
     
-    const [addShow, setAddShow] = useState(false);
     const handleAddShow = () => setAddShow(true);
-    const handleAddClose = () => setAddShow(false);
-
+    const handleAddClose = (reload) => {
+        setAddShow(false);
+        if(reload) {
+            window.location.reload();
+        }
+    }
 
     const paginationModel = { page: 0, pageSize: 25 };
     
     const columns = [
         { field: 'Idx', headerName: 'ID', width: 70 },
-        { field: 'ProcessName', headerName: '프로세스명', width: 330 },
-        { field: 'IsBlack', headerName: '블랙/화이트', width: 220,
+        { field: 'ProcessName', headerName: '프로세스명', width: 300 },
+        { field: 'IsBlack', headerName: '블랙/화이트', width: 100,
             renderCell:(params) => (params.value === 1 ? "블랙" : "화이트")
         },
         {
@@ -49,8 +55,14 @@ function Process() {
           headerName: '자동탐지',
         //   description: 'This column has a value getter and is not sortable.',
         //   sortable: false,
-          width: 120,
+          width: 100,
           renderCell: (params) => (params.value === 1 ? '자동' : '수동'),
+        },
+        {
+            field:"Memo",
+            headerName: "메모",
+            width : 300,
+            renderCell: (params) => (params.value === null ? '' : params.value),
         },
         {
             field: 'Action', // New field for the action column
@@ -92,7 +104,7 @@ function Process() {
     };
 
     const addProcessBtnClick = async () => {
-        handleAddShow()
+        handleAddShow();
     }
       
     useEffect(()=>{
