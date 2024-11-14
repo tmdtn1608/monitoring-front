@@ -42,31 +42,32 @@ function Process() {
     
     const columns = [
         { field: 'Idx', headerName: 'ID', width: 70 },
-        { field: 'ProcessName', headerName: '프로세스명', width: 300 },
+        { field: 'ProcessName', headerName: '프로세스명', width: 200 },
+        { field :'Device', headerName:'디바이스', width:160 },
         { field: 'IsBlack', headerName: '블랙/화이트', width: 100,
             renderCell:(params) => (params.value === 1 ? "블랙" : "화이트")
+        },
+        {
+            field:"Memo",
+            headerName: "메모",
+            width : 250,
+            renderCell: (params) => (params.value === null ? '' : params.value),
+        },
+        {
+            field: 'IsAuto',
+            headerName: '자동탐지',
+            //   description: 'This column has a value getter and is not sortable.',
+            //   sortable: false,
+            width: 100,
+            renderCell: (params) => (params.value === 1 ? '자동' : '수동'),
         },
         {
             field: 'RegDate', headerName: '등록일', width: 220,
             renderCell:(params) => (params.value === null ? '-' : params.value)
         },
         {
-          field: 'IsAuto',
-          headerName: '자동탐지',
-        //   description: 'This column has a value getter and is not sortable.',
-        //   sortable: false,
-          width: 100,
-          renderCell: (params) => (params.value === 1 ? '자동' : '수동'),
-        },
-        {
-            field:"Memo",
-            headerName: "메모",
-            width : 300,
-            renderCell: (params) => (params.value === null ? '' : params.value),
-        },
-        {
-            field: 'Action', // New field for the action column
-            headerName: ' ', // Header for the new column
+            field: 'Action',
+            headerName: ' ',
             width: 300,
             renderCell: (params) => (
                 <>
@@ -86,7 +87,6 @@ function Process() {
     const delProcessBtnClick = async (row) => {
         console.log(`Button clicked for ID: ${row.ProcessName}`);
         let param = {"ProcessName" : row.ProcessName};
-        // Add your desired functionality here
         axios.delete('http://localhost:5000/process',{
             data: param,
             headers: {
@@ -96,7 +96,7 @@ function Process() {
         .then(async (res) => {
             console.log('delete confirm');
             const response = await axios.get('http://localhost:5000/process');
-            setProcessList(response.data); // 응답값을 상태에 저장
+            setProcessList(response.data);
         })
         .catch((error) => {
             console.error(error);
@@ -111,7 +111,7 @@ function Process() {
         const getData = async () => {
             setLoading(true);
             const response = await axios.get('http://localhost:5000/process');
-            setProcessList(response.data); // 응답값을 상태에 저장
+            setProcessList(response.data);
         };
         getData();
     },[]);

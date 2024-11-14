@@ -16,6 +16,7 @@ function License() {
     const columns = [
         { field: 'Idx', headerName: 'ID', width: 70 },
         { field: 'License', headerName: '라이센스', width: 330 },
+        { field: 'Device', headerName: '장비', width: 160 },
         { field: 'CreatedAt', headerName: '생성일', width: 220 },
         {
             field: 'ExpiredAt', headerName: '만료일', width: 220,
@@ -30,8 +31,8 @@ function License() {
           renderCell: (params) => (params.value === 1 ? 'True' : 'False'),
         },
         {
-            field: 'Action', // New field for the action column
-            headerName: ' ', // Header for the new column
+            field: 'Action',
+            headerName: ' ',
             width: 150,
             renderCell: (params) => (
                 <Button onClick={() => delLicenseBtnClick(params.row)}>
@@ -44,7 +45,6 @@ function License() {
     const delLicenseBtnClick = async (row) => {
         console.log(`Button clicked for ID: ${row.License}`);
         let param = {"license" : row.License};
-        // Add your desired functionality here
         axios.delete('http://localhost:5000/license',{
             data: param,
             headers: {
@@ -53,7 +53,7 @@ function License() {
         })
         .then(async (res) => {
             const response = await axios.get('http://localhost:5000/license');
-            setLicenseList(response.data); // 응답값을 상태에 저장
+            setLicenseList(response.data);
         })
         .catch((error) => {
             console.error(error);
@@ -64,7 +64,7 @@ function License() {
         const res = await axios.post('http://localhost:5000/license');
         console.log(res);
         const response = await axios.get('http://localhost:5000/license');
-        setLicenseList(response.data); // 응답값을 상태에 저장
+        setLicenseList(response.data);
     }
       
 
@@ -72,7 +72,7 @@ function License() {
         const getData = async () => {
             setLoading(true);
             const response = await axios.get('http://localhost:5000/license');
-            setLicenseList(response.data); // 응답값을 상태에 저장
+            setLicenseList(response.data);
         };
         getData();
     },[]);

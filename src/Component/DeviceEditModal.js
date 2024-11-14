@@ -10,28 +10,14 @@ function EditModal({data, show, close}) {
     const [visible, setVisible] = useState(false);
     const [rowData, setRowData] = useState(null);
     
-    const [formData, setFormData] = useState({
-        NickInput: '',
-        IsUsedInput: false,
-    });
     const [idx , setIdx] = useState(-1);
 
     const IsUsedRef = useRef(null);
     const NickRef = useRef(null);
 
-    // 텍스트와 체크박스 값 변경 핸들러
-    const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setFormData((prevData) => ({
-        ...prevData,
-        [name]: type === 'checkbox' ? checked : value,
-        }));
-    };
-
     // 폼 제출 핸들러
     const handleSubmit = (e) => {
         e.preventDefault(); // 기본 제출 동작 방지 (페이지 리로드 방지)
-        console.log(formData); // 폼 데이터 출력
         let changedIdx = idx;
         let param = { 
             "mac" : rowData.mac, 
@@ -90,7 +76,7 @@ function EditModal({data, show, close}) {
                             <Form.Check 
                                 name="IsUsedInput" type="checkbox" 
                                 defaultChecked={rowData === null ? false : rowData.IsUsed === 1} 
-                                onChange={handleChange} ref={IsUsedRef}
+                                ref={IsUsedRef}
                                 />
                         </Form.Group>
                         <Form.Group className="d-flex align-items-center mb-3">
@@ -98,7 +84,7 @@ function EditModal({data, show, close}) {
                             <Form.Control 
                                 name="NickInput" type="text" 
                                 defaultValue={rowData === null ? '' : rowData.Nick} 
-                                onChange={handleChange} ref={NickRef}
+                                ref={NickRef}
                                 />
                         </Form.Group>
                         

@@ -30,14 +30,14 @@ function Device() {
 
     const columns = [
         { field: 'Idx', headerName: 'ID', width: 70 },
-        { field: 'mac', headerName: '디바이스(맥주소)', width: 330 },
+        { field: 'mac', headerName: '디바이스(맥주소)', width: 160 },
         { field : 'Nick', headerName: '닉네임', width : 200 },
-        { field: 'IsUsed', headerName: '라이센스 사용여부', width: 330,
+        { field: 'IsUsed', headerName: '라이센스 사용여부', width: 150,
             renderCell:(params) => (params.value === 1 ? '사용중' : '미사용')
         },
         {
-            field: 'Action', // New field for the action column
-            headerName: ' ', // Header for the new column
+            field: 'Action',
+            headerName: ' ',
             width: 300,
             renderCell: (params) => (
                 <>
@@ -59,7 +59,6 @@ function Device() {
     const delDeviceBtnClick = async (row) => {
         console.log(`Button clicked for ID: ${row.mac}`);
         let param = {"mac" : row.mac};
-        // Add your desired functionality here
         axios.delete('http://localhost:5000/device',{
             data: param,
             headers: {
@@ -68,22 +67,18 @@ function Device() {
         })
         .then(async (res) => {
             const response = await axios.get('http://localhost:5000/device');
-            setDeviceList(response.data); // 응답값을 상태에 저장
+            setDeviceList(response.data);
         })
         .catch((error) => {
             console.error(error);
         });
     };
 
-    const editDeviceBtnClick = async () => {
-
-    }
-
     useEffect(()=>{
         const getData = async () => {
             setLoading(true);
             const response = await axios.get('http://localhost:5000/device');
-            setDeviceList(response.data); // 응답값을 상태에 저장
+            setDeviceList(response.data);
         };
         getData();
     },[]);

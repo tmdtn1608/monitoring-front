@@ -6,7 +6,7 @@ import Form from 'react-bootstrap/Form';
 import '../CSS/EditModal.css';
 
 
-function AddModal({show, close}) {
+function AddModal({data, show, close}) {
 
     const [visible, setVisible] = useState(false);
 
@@ -53,20 +53,22 @@ Memo
         close(reload);
         setVisible(false);
     }
+    /*
+
+{device: '60:3e:5f:4d:23:11', 
+row:{
+    "pid": 0,
+    "name": "kernel_task",
+    "status": "running",
+    "cpu_percent": null,
+    "memory_percent": null
+    }
+}
+    */
     useEffect(() => {
         setVisible(show);
     }, [show]);
     
-/*
-
-{"Idx":1,"ProcessName":"abc",
-"IsBlack":1,
-"RegDate":"2024-11-05T10:25:06.000Z",
-"IsAuto":0,
-"Memo":""}
-*/
-
-
     return (
         <>
             <Modal show={visible} onHide={() => handleClose(false)}>
@@ -79,12 +81,14 @@ Memo
                         <Form.Group className="d-flex align-items-center mb-3">
                             <Form.Label className="Edit-Modal-Label">Process name</Form.Label>
                             <Form.Control 
-                                name="processInput" type="text" ref={ProcessRef} />
+                                name="processInput" type="text" ref={ProcessRef} 
+                                value={data === null ? '' : data.row.name} disabled/>
                         </Form.Group>
                         <Form.Group className="d-flex align-items-center mb-3">
                             <Form.Label className="Edit-Modal-Label">Device </Form.Label>
                             <Form.Control 
-                                name="deviceInput" type="text" ref={DeviceRef} />
+                                name="deviceInput" type="text" ref={DeviceRef} 
+                                value={data === null ? '' : data.device} disabled/>
                         </Form.Group>
                         <Form.Group className="d-flex align-items-center mb-3">
                             <Form.Label className="Edit-Modal-Label">Black</Form.Label>

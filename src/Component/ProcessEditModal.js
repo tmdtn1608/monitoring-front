@@ -10,25 +10,13 @@ function EditModal({data, show, close}) {
     const [visible, setVisible] = useState(false);
     const [rowData, setRowData] = useState(null);
 
-    const [formData, setFormData] = useState({
-        MemoInput: '',
-        BlackInput: false,
-        AutoInput: false,
-    });
     const [idx , setIdx] = useState(-1);
 
+    const DeviceRef = useRef(null);
     const BlackRef = useRef(null);
     const AutoRef = useRef(null);
     const MemoRef = useRef(null);
 
-    // 텍스트와 체크박스 값 변경 핸들러
-    const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setFormData((prevData) => ({
-        ...prevData,
-        [name]: type === 'checkbox' ? checked : value,
-        }));
-    };
 /* 
 processName -> rowData.ProcessName
 IsBlack
@@ -38,10 +26,10 @@ Memo
     // 폼 제출 핸들러
     const handleSubmit = (e) => {
         e.preventDefault(); // 기본 제출 동작 방지 (페이지 리로드 방지)
-        console.log(formData); // 폼 데이터 출력
         let changedIdx = idx;
         let param = {
             "processName" : rowData.ProcessName,
+            "device" : DeviceRef.current.value,
             "IsBlack" : BlackRef.current.checked,
             "IsAuto" : AutoRef.current.checked,
             "Memo" : MemoRef.current.value
@@ -100,25 +88,28 @@ Memo
                                 value={rowData === null ? '' : rowData.ProcessName} disabled/>
                         </Form.Group>
                         <Form.Group className="d-flex align-items-center mb-3">
+                            <Form.Label className="Edit-Modal-Label">Device</Form.Label>
+                            <Form.Control 
+                                name="DeviceInput" type="text" ref={DeviceRef}
+                                defaultValue={rowData === null ? '' : rowData.Device} />
+                        </Form.Group>
+                        <Form.Group className="d-flex align-items-center mb-3">
                             <Form.Label className="Edit-Modal-Label">Black</Form.Label>
                             <Form.Check 
                                 name="BlackInput" type="checkbox" ref={BlackRef}
-                                defaultChecked={rowData === null ? false : rowData.IsBlack === 1} 
-                                onChange={handleChange} />
+                                defaultChecked={rowData === null ? false : rowData.IsBlack === 1} />
                         </Form.Group>
                         <Form.Group className="d-flex align-items-center mb-3">
                             <Form.Label className="Edit-Modal-Label">Auto</Form.Label>
                             <Form.Check 
                                 name="AutoInput" type="checkbox" ref={AutoRef}
-                                defaultChecked={rowData === null ? false : rowData.IsAuto === 1} 
-                                onChange={handleChange} />
+                                defaultChecked={rowData === null ? false : rowData.IsAuto === 1} />
                         </Form.Group>
                         <Form.Group className="d-flex align-items-center mb-3">
                             <Form.Label className="Edit-Modal-Label">Memo</Form.Label>
                             <Form.Control 
                                 name="MemoInput" type="text" ref={MemoRef}
-                                defaultValue={rowData === null ? '' : rowData.Memo} 
-                                onChange={handleChange} />
+                                defaultValue={rowData === null ? '' : rowData.Memo} />
                         </Form.Group>
                         
                     </Form>

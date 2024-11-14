@@ -1,5 +1,8 @@
 import React, { useEffect, useState, createContext } from 'react';
 import axios from 'axios';
+import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
@@ -14,222 +17,145 @@ import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import '../CSS/Process.css'
-
-
-function Row(props) {
-    const { row } = props;
-    const [open, setOpen] = React.useState(false);
-    
-    return (
-        <React.Fragment>
-            <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
-                <TableCell>
-                    <IconButton
-                    aria-label="expand row"
-                    size="small"
-                    onClick={() => setOpen(!open)}
-                    >
-                    {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-                    </IconButton>
-                </TableCell>
-                <TableCell component="th" scope="row">{row.device}</TableCell>
-                <TableCell align="left">{row.date}</TableCell>
-            </TableRow>
-            <TableRow>
-            <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-                <Collapse in={open} timeout="auto" unmountOnExit>
-                <Box sx={{ margin: 1 }}>
-                    <Typography variant="h6" gutterBottom component="div">
-                    History
-                    </Typography>
-                    <Table size="small" aria-label="purchases">
-                    <TableHead>
-                        <TableRow>
-                        <TableCell>Date</TableCell>
-                        <TableCell>Customer</TableCell>
-                        <TableCell align="right">Amount</TableCell>
-                        <TableCell align="right">Total price ($)</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {row.history.map((historyRow) => (
-                            <TableRow key={historyRow.date}>
-                            <TableCell component="th" scope="row">
-                            {historyRow.date}
-                            </TableCell>
-                            <TableCell>{historyRow.customerId}</TableCell>
-                            <TableCell align="right">{historyRow.amount}</TableCell>
-                            <TableCell align="right">
-                            {Math.round(historyRow.amount * row.price * 100) / 100}
-                            </TableCell>
-                        </TableRow>
-                        ))}
-                    </TableBody>
-                    </Table>
-                </Box>
-                </Collapse>
-            </TableCell>
-            </TableRow>
-      </React.Fragment>
-    );
-}
-
-Row.propTypes = {
-    row: PropTypes.shape({
-        calories: PropTypes.number.isRequired,
-        carbs: PropTypes.number.isRequired,
-        fat: PropTypes.number.isRequired,
-        history: PropTypes.arrayOf(
-            PropTypes.shape({
-                amount: PropTypes.number.isRequired,
-                customerId: PropTypes.string.isRequired,
-                date: PropTypes.string.isRequired,
-            }),
-        ).isRequired,
-        name: PropTypes.string.isRequired,
-        price: PropTypes.number.isRequired,
-        protein: PropTypes.number.isRequired,
-    }).isRequired,
-};
-
-
+import '../CSS/Realtime.css'
+import AddModal from './RealtimeAddModal';
+import TerminateModal from './ProcessTerminateModal';
 
 function RealTime() {
 
     // API 값 저장을 위한 State
-    const [realtimeList, setRealtimeList] = useState(null);
+    const [alive,setAlive] = useState([]);
+    const [device, setDevice] = useState('');
+    const [historyList, setHistoryList] = useState(null);
     // 로딩 및 에러상태를 관리하기 위한 State
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const paginationModel = { page: 0, pageSize: 25 };
 
-    const [messages, setMessages] = useState([]);
-    const [socket, setSocket] = useState(null);
+    const [addShow, setAddShow] = useState(false);
+    const [terminateShow, setTerminateShow] = useState(false);
 
-    const [rows, setRows] = useState([]);
+    const [addRow, setAddrow] = useState({"device" :"","row": ""});
+    const [terminateRow, setTerminateRow] = useState({"device" :"","row": ""});
 
     useEffect(() => {
         const getData = async () => {
-            setLoading(true);
-            const response = await axios.get('http://localhost:5000/history');
-            setRealtimeList(response.data);
-            console.log(JSON.stringify(response.data));
-            if(response.data != null) {
-                response.data.forEach(el => {
-                    rows.push(createData(el.Device, el.last_login))
-                });
-
-            }
-
-            /*
-    [
-        {
-            "Device":"60:3e:5f:4d:23:11",
-            "last_login":"2024-11-09T04:53:47.000Z"
-        }
-    ]
-            */
-        }
-        getData();
-
-        // 웹소켓 연결
-        const ws = new WebSocket('ws://localhost:5000/ws');
-    
-        // 웹소켓이 열렸을 때
-        ws.onopen = () => {
-          console.log('Connected to the WebSocket server');
-          ws.send('Hello Server!');  // 서버로 메시지 전송
-        };
-    
-        // 웹소켓이 메시지를 수신했을 때
-        ws.onmessage = (event) => {
             try {
-                // client에서 던저진 데이터는 blob으로 온다.
-                if(typeof event.data == 'object') {
-                    // 가능한 경우 JSON 파싱 시도
-                    const blob = event.data;
-    
-                    // Blob을 텍스트로 변환
-                    const reader = new FileReader();
-                    
-                    reader.onloadend = function() {
-                        const jsonString = reader.result;
-                        const parsedData = JSON.parse(jsonString);
-                        // console.log('Received parsed data:', parsedData);
-
-                        for (const element of parsedData.process) {
-                            if (element.name === "KakaoTalk") {
-                                console.log("Found It!");
-                            }
-                        }
-                    };
-                    reader.readAsText(blob);  // Blob을 텍스트로 변환
-                    // setMessages((prevMessages) => [...prevMessages, event.data]);
-                } 
-                else if (typeof event.data == 'string') {
-                    console.log(`Connected. ${event.data}`);
-                }
+              const response = await axios.get('http://localhost:5000/log/alive');
+              setAlive(response.data.map(item => item.Device));
             } catch (error) {
-                // JSON 형식이 아닐 경우 예외 처리 (즉, 단순 문자열 메시지)
-                console.error('Error parsing JSON:', error);
+              console.error(error);
+            } finally {
+              setLoading(false); // 데이터 로딩 완료 후 false로 설정
             }
-           
-        };
-    
-        // 웹소켓이 닫혔을 때
-        ws.onclose = () => {
-          console.log('Disconnected from the WebSocket server');
-        };
-    
-        // 웹소켓이 에러를 발생했을 때
-        ws.onerror = (error) => {
-          console.error('WebSocket error:', error);
-        };
-    
-        // 컴포넌트 언마운트 시 웹소켓 연결 해제
-        return () => {
-          ws.close();
-        };
-      }, []);
+          };
+          getData();
+    }, []);
 
-    function createData(device, date) {
-        console.log(device);
-        return {
-            device,
-            date,
-            history: [
-                {
-                date: '2020-01-05',
-                customerId: '11091700',
-                amount: 3,
-                },
-                {
-                date: '2020-01-02',
-                customerId: 'Anonymous',
-                amount: 1,
-                },
-            ],
-        };
+    useEffect(() => {
+        if (!loading && device) {
+            // TODO : 주기적으로 호출하기
+            let param = {"device" : device };
+            axios.get('http://localhost:5000/log/',param)
+            .then((res) => {
+                let arr = res.data.map(item => item.Process);
+                setHistoryList(arr[0].process);
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+        } else {
+            // TODO : 인터벌 초기화
+        }
+    },[device,loading]);
+
+/*
+{
+    "pid":1,
+    "name":"launchd"
+    ,"status":"running",
+    "cpu_percent":null,
+    "memory_percent":null},
+*/
+
+      const columns = [
+        { field: 'pid', headerName: 'PID', width: 100 },
+        { field: 'name', headerName: '프로세스명', width: 330 },
+        { field: 'status', headerName: '상태', width : 120 },
+        { field: 'cpu_percent', headerName: 'cpu 사용률', width: 120},
+        { field: 'memory_percent', headerName: 'memory 사용률', width: 120},
+        {
+            field: 'Action',
+            headerName: ' ',
+            width: 300,
+            renderCell: (params) => (
+                <>
+                    <Button
+                        className='Control-Btn'
+                        onClick={() => handleAddShow(device, params.row)}>
+                        프로세스 등록
+                    </Button>
+                    <Button className='Control-Btn' 
+                        onClick={() => handleTerminateProcess(device, params.row)}>
+                        프로세스 종료
+                    </Button>
+                </>
+            ),
+        },
+        
+    ];
+
+    const handleAddShow = (device, row) => {
+        setAddrow({"device" : device,"row":row});
+        setAddShow(true);
+    }
+    const handleAddClose = (reload) => {
+        setAddShow(false);
+        if(reload) {
+            window.location.reload();
+        }
+    }
+
+    const handleTerminateProcess = (device, row) => {
+        setTerminateRow({"device" : device,"row":row});
+        setTerminateShow(true);
+    };
+
+    const ChangeAlive = (event) => {
+        const selectedItem = event.target.value;
+        if (selectedItem && selectedItem !== device) {
+            setDevice(selectedItem);
+        }
     }
     
     return (
         <div className='Table-container'>
-            <TableContainer component={Paper}>
-                <Table aria-label="collapsible table">
-                    <TableHead>
-                        <TableRow>
-                            <TableCell />
-                            <TableCell>Device</TableCell>
-                            <TableCell>Date</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                    {rows.map((row) => (
-                        <Row key={row.device} row={row} />
+            <div className='License-Button-container'>
+                <Form.Select
+                    className='live-list'
+                    value={device}
+                    onChange={ChangeAlive}>
+                    <option value={''}></option>
+                    {alive.map((device, index) => (
+                    <option key={index} value={device}>
+                        {device}
+                    </option>
                     ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+                </Form.Select>
+            </div>
+            <Paper sx={{ height: '100%', width: '100%' }}>
+                <DataGrid
+                    rows={historyList}
+                    columns={columns}
+                    getRowId={(row) => row.pid}
+                    initialState={{ pagination: { paginationModel } }}
+                    pageSizeOptions={[15, 25, 50]}
+                    sx={{ border: 0 }}
+            />
+            </Paper>
+            <AddModal data={addRow} show={addShow} close={handleAddClose}/>
+            <TerminateModal 
+                data={terminateRow} show={terminateShow} close={handleAddClose}/>
         </div>
     );
 
