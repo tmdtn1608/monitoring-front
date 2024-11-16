@@ -59,14 +59,14 @@ function Device() {
     const delDeviceBtnClick = async (row) => {
         console.log(`Button clicked for ID: ${row.mac}`);
         let param = {"mac" : row.mac};
-        axios.delete('http://localhost:5000/device',{
+        axios.delete(process.env.REACT_APP_DEVICE_URL,{
             data: param,
             headers: {
               'Content-Type': 'application/json'
             }
         })
         .then(async (res) => {
-            const response = await axios.get('http://localhost:5000/device');
+            const response = await axios.get(process.env.REACT_APP_DEVICE_URL);
             setDeviceList(response.data);
         })
         .catch((error) => {
@@ -77,7 +77,7 @@ function Device() {
     useEffect(()=>{
         const getData = async () => {
             setLoading(true);
-            const response = await axios.get('http://localhost:5000/device');
+            const response = await axios.get(process.env.REACT_APP_DEVICE_URL);
             setDeviceList(response.data);
         };
         getData();

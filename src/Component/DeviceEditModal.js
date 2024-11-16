@@ -24,8 +24,7 @@ function EditModal({data, show, close}) {
             "isUsed" : IsUsedRef.current.checked, 
             "nick" : NickRef.current.value
         };
-        console.log(JSON.stringify(param));
-        axios.put('http://localhost:5000/device',param)
+        axios.put(process.env.REACT_APP_DEVICE_URL,param)
         .then((result) => {
             console.log(`chk put result ${result}`);
         }).catch((error) => {

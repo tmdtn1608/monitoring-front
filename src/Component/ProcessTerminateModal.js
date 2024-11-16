@@ -9,7 +9,7 @@ import '../CSS/EditModal.css';
 function TerminateModal({data, show, close}) {
 
     const [visible, setVisible] = useState(false);
-
+    const [ws, setWs] = useState(null);
     const [device, setDevice] = useState('');
     const [process, setProcess] = useState('');
 
@@ -18,18 +18,28 @@ function TerminateModal({data, show, close}) {
         setVisible(false);
     }
 
+    const sendTerminate = (device, process) => {
+        console.log("sendTerminate");
+          let msg = {
+            "from" : "web",
+            "device" : device,
+            "process" : process
+          };
+        ws.send(JSON.stringify(msg));
+        // TODO : 히스토리 저장
+    }
+
     const terminateProcess = () => {
         console.log(`Terminate : ${process} / ${device}`);
-        // TODO : 웹소켓 접속 후 terminate 메시지 전송
-
-        // 웹소켓 연결
+        sendTerminate(device, process);
+        handleClose(true);
+    }
+    const handleWebSocketConnection = () => {
         const ws = new WebSocket('ws://localhost:5000/ws');
     
         // 웹소켓이 열렸을 때
         ws.onopen = () => {
           console.log('Connected to the WebSocket server');
-          ws.send('Hello Server!');  // 서버로 메시지 전송
-          ws.close();
         };
     
         // 웹소켓이 닫혔을 때
@@ -41,6 +51,7 @@ function TerminateModal({data, show, close}) {
         ws.onerror = (error) => {
           console.error('WebSocket error:', error);
         };
+        setWs(ws);
     }
     /*
 
@@ -57,10 +68,14 @@ row:{
     useEffect(() => {
         console.log(data);
         setVisible(show);
+        // if(data.device === '' || data.row === '') return;
         if(data !== null) {
             console.log(`${data.device} / ${data.row.name}`);
-            setProcess(data.row.name);
-            setDevice(data.device);
+            if(data.device !== '' && data.row.name !== '') {
+                setProcess(data.row.name);
+                setDevice(data.device);
+                handleWebSocketConnection();
+            }
         }
     }, [show]);
 

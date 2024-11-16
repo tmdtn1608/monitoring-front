@@ -35,7 +35,7 @@ Memo
             "Memo" : MemoRef.current.value
         };
         console.log(JSON.stringify(param));
-        axios.put('http://localhost:5000/process',param)
+        axios.put(process.env.REACT_APP_PROCESS_URL,param)
         .then((res) => {
             console.log(`put result : ${res}`);
         }).catch((error) => {

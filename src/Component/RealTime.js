@@ -1,22 +1,9 @@
-import React, { useEffect, useState, createContext } from 'react';
+import React, { useEffect, useState, createContext, useRef } from 'react';
 import axios from 'axios';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import PropTypes from 'prop-types';
-import Box from '@mui/material/Box';
-import Collapse from '@mui/material/Collapse';
-import IconButton from '@mui/material/IconButton';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import '../CSS/Realtime.css'
 import AddModal from './RealtimeAddModal';
 import TerminateModal from './ProcessTerminateModal';
@@ -38,37 +25,66 @@ function RealTime() {
     const [addRow, setAddrow] = useState({"device" :"","row": ""});
     const [terminateRow, setTerminateRow] = useState({"device" :"","row": ""});
 
+    const [dataInterval, setDataInterval] = useState(-1);
+
+    const deviceListRef = useRef(null);
+
     useEffect(() => {
         const getData = async () => {
             try {
-              const response = await axios.get('http://localhost:5000/log/alive');
+              const response = await axios.get(process.env.REACT_APP_ALIVE_URL);
               setAlive(response.data.map(item => item.Device));
             } catch (error) {
               console.error(error);
             } finally {
               setLoading(false); // 데이터 로딩 완료 후 false로 설정
             }
-          };
-          getData();
+        };
+
+        const startInterval = () => {
+            getData(); // 첫 번째 요청을 보냄
+            setTimeout(startInterval, 10000); // 5초 후에 다시 호출
+        };
+
+          startInterval();
     }, []);
 
     useEffect(() => {
+        if(device !== '' && !alive.includes(device)) {
+            window.location.reload();
+        }
+    },[alive]);
+
+    useEffect(() => {
+        console.log(`current device ${device}`);
+        console.log(`current dataInterval ${dataInterval}`);
         if (!loading && device) {
-            // TODO : 주기적으로 호출하기
+            let intervalId = 0;
+            console.log(`device chk : ${device === ''}`)
             let param = {"device" : device };
-            axios.get('http://localhost:5000/log/',param)
-            .then((res) => {
-                let arr = res.data.map(item => item.Process);
-                setHistoryList(arr[0].process);
-            })
-            .catch((error) => {
-                console.error(error);
-            });
+            const getData = async () => {
+                axios.get(process.env.REACT_APP_LOG_URL,param)
+                .then((res) => {
+                    let arr = res.data.map(item => item.Process);
+                    setHistoryList(arr[0].process);
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+            }
+            const startInterval = () => {
+                getData(); // 첫 번째 요청을 보냄
+                intervalId = setTimeout(startInterval, 10000); // 5초 후에 다시 호출
+            };
+            setDataInterval(intervalId);
+    
+            startInterval();
         } else {
             // TODO : 인터벌 초기화
         }
-    },[device,loading]);
 
+    },[device,loading]);
+    
 /*
 {
     "pid":1,
@@ -132,14 +148,15 @@ function RealTime() {
         <div className='Table-container'>
             <div className='License-Button-container'>
                 <Form.Select
+                    ref={deviceListRef}
                     className='live-list'
                     value={device}
                     onChange={ChangeAlive}>
                     <option value={''}></option>
                     {alive.map((device, index) => (
-                    <option key={index} value={device}>
-                        {device}
-                    </option>
+                        <option key={index} value={device}>
+                            {device}
+                        </option>
                     ))}
                 </Form.Select>
             </div>

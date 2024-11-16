@@ -45,14 +45,14 @@ function License() {
     const delLicenseBtnClick = async (row) => {
         console.log(`Button clicked for ID: ${row.License}`);
         let param = {"license" : row.License};
-        axios.delete('http://localhost:5000/license',{
+        axios.delete(process.env.REACT_APP_LICENSE_URL,{
             data: param,
             headers: {
               'Content-Type': 'application/json'
             }
         })
         .then(async (res) => {
-            const response = await axios.get('http://localhost:5000/license');
+            const response = await axios.get(process.env.REACT_APP_LICENSE_URL);
             setLicenseList(response.data);
         })
         .catch((error) => {
@@ -61,9 +61,9 @@ function License() {
     };
 
     const addLicenseBtnClick = async () => {
-        const res = await axios.post('http://localhost:5000/license');
+        const res = await axios.post(process.env.REACT_APP_LICENSE_URL);
         console.log(res);
-        const response = await axios.get('http://localhost:5000/license');
+        const response = await axios.get(process.env.REACT_APP_LICENSE_URL);
         setLicenseList(response.data);
     }
       
@@ -71,7 +71,7 @@ function License() {
     useEffect(()=>{
         const getData = async () => {
             setLoading(true);
-            const response = await axios.get('http://localhost:5000/license');
+            const response = await axios.get(process.env.REACT_APP_LICENSE_URL);
             setLicenseList(response.data);
         };
         getData();
