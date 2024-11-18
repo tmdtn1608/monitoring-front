@@ -16,6 +16,7 @@ function BasicExample() {
             <Nav.Link href="device">Device</Nav.Link>
             <Nav.Link href="realtime">Realtime</Nav.Link>
             <Nav.Link href="process">Process</Nav.Link>
+            <Nav.Link href="log">Log</Nav.Link>
           </Nav>
         </Navbar.Collapse>
       </Container>
