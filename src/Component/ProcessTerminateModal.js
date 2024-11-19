@@ -35,7 +35,7 @@ function TerminateModal({data, show, close}) {
         handleClose(true);
     }
     const handleWebSocketConnection = () => {
-        const ws = new WebSocket('ws://localhost:5000/ws');
+        const ws = new WebSocket(process.env.REACT_APP_WS_URL);
     
         // 웹소켓이 열렸을 때
         ws.onopen = () => {
