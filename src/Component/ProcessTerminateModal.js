@@ -12,6 +12,7 @@ function TerminateModal({data, show, close}) {
     const [ws, setWs] = useState(null);
     const [device, setDevice] = useState('');
     const [process, setProcess] = useState('');
+    const [wsUrl, setWsUrl] = useState(process.env.REACT_APP_WS_URL)
 
     const handleClose = (reload) => {
         close(reload);
@@ -35,7 +36,7 @@ function TerminateModal({data, show, close}) {
         handleClose(true);
     }
     const handleWebSocketConnection = () => {
-        const ws = new WebSocket(process.env.REACT_APP_WS_URL);
+        const ws = new WebSocket(wsUrl);
     
         // 웹소켓이 열렸을 때
         ws.onopen = () => {
@@ -66,6 +67,7 @@ row:{
 }
     */
     useEffect(() => {
+        console.log(wsUrl);
         console.log(data);
         setVisible(show);
         // if(data.device === '' || data.row === '') return;

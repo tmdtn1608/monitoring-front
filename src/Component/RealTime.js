@@ -45,8 +45,8 @@ function RealTime() {
             getData(); // 첫 번째 요청을 보냄
             setTimeout(startInterval, 10000); // 5초 후에 다시 호출
         };
-
-          startInterval();
+        console.log(process.env.REACT_APP_WS_URL);
+        startInterval();
     }, []);
 
     useEffect(() => {
