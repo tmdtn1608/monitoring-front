@@ -6,13 +6,13 @@ import Form from 'react-bootstrap/Form';
 import '../CSS/EditModal.css';
 
 
-function TerminateModal({data, show, close}) {
+function TerminateModal({url, data, show, close}) {
 
     const [visible, setVisible] = useState(false);
     const [ws, setWs] = useState(null);
     const [device, setDevice] = useState('');
     const [process, setProcess] = useState('');
-    const [wsUrl, setWsUrl] = useState(process.env.REACT_APP_WS_URL)
+    const [wsUrl, setWsUrl] = useState(url)
 
     const handleClose = (reload) => {
         close(reload);
@@ -36,6 +36,8 @@ function TerminateModal({data, show, close}) {
         handleClose(true);
     }
     const handleWebSocketConnection = () => {
+        console.log(`url from param : ${url}`);
+        console.log(`url from state : ${wsUrl}`);
         const ws = new WebSocket(wsUrl);
     
         // 웹소켓이 열렸을 때
@@ -67,7 +69,7 @@ row:{
 }
     */
     useEffect(() => {
-        console.log(wsUrl);
+        console.log(url);
         console.log(data);
         setVisible(show);
         // if(data.device === '' || data.row === '') return;

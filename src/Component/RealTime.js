@@ -172,6 +172,7 @@ function RealTime() {
             </Paper>
             <AddModal data={addRow} show={addShow} close={handleAddClose}/>
             <TerminateModal 
+                url={process.env.REACT_APP_WS_URL}
                 data={terminateRow} show={terminateShow} close={handleAddClose}/>
         </div>
     );
