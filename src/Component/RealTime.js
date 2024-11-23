@@ -17,7 +17,7 @@ function RealTime() {
     // 로딩 및 에러상태를 관리하기 위한 State
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const paginationModel = { page: 0, pageSize: 25 };
+    const paginationModel = { page: 0, pageSize: 50 };
 
     const [addShow, setAddShow] = useState(false);
     const [terminateShow, setTerminateShow] = useState(false);
@@ -166,7 +166,7 @@ function RealTime() {
                     columns={columns}
                     getRowId={(row) => row.pid}
                     initialState={{ pagination: { paginationModel } }}
-                    pageSizeOptions={[15, 25, 50]}
+                    pageSizeOptions={[30, 50, 100]}
                     sx={{ border: 0 }}
             />
             </Paper>
